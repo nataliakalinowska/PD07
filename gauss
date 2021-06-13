@@ -1,0 +1,86 @@
+package PD07;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
+import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class Gauss {
+    BufferedImage zdjecie;
+    int szerokosc;
+    int wysokosc;
+    int red;
+    int green;
+    int blue;
+    
+    public Gauss()
+    {
+        try{
+            File wejscie = new File("kolor.jpg");
+            zdjecie = ImageIO.read(wejscie);
+            szerokosc = zdjecie.getWidth();
+            wysokosc = zdjecie.getHeight();
+            
+            int[][] M = new int[][] { {1,2,1}, {2,2*2,2}, {1,2,1}};
+            double red_pnym = 0, green_pnym = 0, blue_pnym = 0;
+            
+            for(int i = 0 ; i < wysokosc -1; i++)
+            {
+                for(int j = 0 ; j < szerokosc - 1; j++)
+                {
+                    red = 0;
+                    green = 0; 
+                    blue = 0;
+                    
+                    for (int k = -1; k <= 1; k++) {
+
+                        for (int l = -1; l <= 1; l++) {
+
+                            //odczyt składowych koloru RGB
+                            Color c = new Color(zdjecie.getRGB(j + k, i + l));
+
+                            red = (c.getRed());
+                            green = (c.getGreen());
+                            blue = (c.getBlue());
+
+                            red_pnym += red * M[k + 1][l + 1];
+                            green_pnym += green * M[k + 1][l + 1];
+                            blue_pnym += blue * M[k + 1][l + 1];
+
+                        }
+                    }
+                    red_pnym = 100 * Math.exp(-(i * i + j * j) / (2 * red_pnym * red_pnym));
+                    green_pnym = 100 * Math.exp(-(i * i + j * j) / (2 * green_pnym * green_pnym));
+                    blue_pnym = 100 * Math.exp(-(i * i + j * j) / (2 * blue_pnym * blue_pnym));
+
+
+                    if (red >= 0 && red <= 255)
+                        red = (int) red_pnym;
+
+                    if (green >= 0 && green <= 255)
+                        green = (int) green_pnym;
+
+                    if (blue >= 0 && blue <= 255)
+                        blue = (int) blue_pnym;
+
+
+                    Color newColor = new Color(red, green, blue);
+                    zdjecie.setRGB(j, i, newColor.getRGB());
+
+
+                } //koniec dwóch pętli po kolumnach i wierszach obrazu
+            }
+
+            //zapis do pliku zmodyfikowanego obrazu
+            File ouptut = new File("gaussa.jpeg");
+            ImageIO.write(zdjecie, "jpeg", ouptut);
+
+        } catch (Exception e) {}
+    }
+
+    static public void main(String args[]) throws Exception
+    {
+        Gauss obj = new Gauss();
+    }
+}
