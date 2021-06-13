@@ -1,0 +1,84 @@
+package PD07;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import javax.imageio.ImageIO;
+
+public class Rozmywajacy {
+
+    BufferedImage zdjecie;
+    int szerokosc;
+    int wysokosc;
+
+
+    public Rozmywajacy() {
+
+        try {
+
+            
+            File wejscie = new File("kolor.jpg");
+
+            zdjecie = ImageIO.read(wejscie);
+            szerokosc = zdjecie.getWidth();
+            wysokosc = zdjecie.getHeight();
+
+            float[][] M = new float[][] { {1.0f/9.0f,1.0f/9.0f,1.0f/9.0f}, {1.0f/9.0f,1.0f/9.0f,1.0f/9.0f}, {1.0f/9.0f,1.0f/9.0f,1.0f/9.0f}};
+
+            
+            for(int i=1; i<wysokosc-1; i++){
+
+                for(int j=1; j<szerokosc-1; j++){
+
+                    Color color = new Color(zdjecie.getRGB(j, i));
+
+                    int red = (color.getRed());
+                    int green = (color.getGreen());
+                    int blue = (color.getBlue());;
+
+                    int red_pnym = 0;
+                    int green_pnym = 0;
+                    int blue_pnym = 0;
+
+                    for (int k=-1;k<=1;k++) {
+
+                        for (int l=-1; l<=1;l++) {
+
+                            
+                            Color c = new Color(zdjecie.getRGB(j+l, i+k));
+
+                            red = (c.getRed());
+                            green = (c.getGreen());
+                            blue = (c.getBlue());
+
+                            red_pnym += red * M[k+1][l+1];
+                            green_pnym += green * M[k+1][l+1];
+                            blue_pnym += blue * M[k+1][l+1];
+                        }
+                    }
+
+                    if (red>=0 && red <=255)
+                        red =  red_pnym;
+
+                    if (green>=0 && green <=255)
+                        green =  green_pnym;
+
+                    if (blue >=0 && blue <=255)
+                        blue =  blue_pnym;
+
+
+                    Color newColor = new Color(red, green, blue);
+                    zdjecie.setRGB(j,i,newColor.getRGB());
+
+
+
+                } //koniec dwóch pêtli po kolumnach i wierszach obrazu
+            }
+
+            //zapis do pliku zmodyfikowanego obrazu
+            File ouptut = new File("zmiana.jpg");
+            ImageIO.write(zdjecie, "jpg", ouptut);
+
+        } catch (Exception e) {}
+    }
+}
