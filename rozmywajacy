@@ -17,7 +17,7 @@ public class Rozmywajacy {
         try {
 
             
-            File wejscie = new File("kolor.jpg");
+            File wejscie = new File("rzym.jpg");
 
             zdjecie = ImageIO.read(wejscie);
             szerokosc = zdjecie.getWidth();
